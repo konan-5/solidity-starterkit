@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 class WaitlistConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "waitlist"
+    name = "tendr_backend.waitlist"
