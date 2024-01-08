@@ -11,12 +11,12 @@ SECRET_KEY = env(
     default="lQ9Kjda5PeFtky0CnG29NoTsAlppgDgfwKymr7sfc9tooiPi1ra74lQ4opF1NaUT",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1","localhost:5173","tendr.vercel.app"]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "3.253.3.32"]
 
 
 CORS_ORIGIN_WHITELIST = [
-    "http://localhost:5173",
-    "https://tendr.vercel.app",
+    "http://localhost:9001",
+    "http://3.253.3.32:9001",
 ]
 # CACHES
 # ------------------------------------------------------------------------------
