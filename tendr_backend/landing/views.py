@@ -59,8 +59,51 @@ class Scrape(APIView):
                         joined_string = "\n".join(values_list)
                         work_item ={
                             "title":title,
-                            "deadline":datetime.strptime(tenders_deadline, "%a %b %d %H:%M:%S GMT %Y").strftime("%d/%m/%Y %H:%M:%S"),
+                            "deadline":datetime.strptime(tenders_deadline, "%a %b %d %H:%M:%S GMT %Y").strftime("%d/%m/%Y"),
                             "client": client,
+                            "value":estimated_value,
+                        }
+                        work_items.append(work_item)
+            result = {
+                "category":req["category"],
+                "workItems":work_items,
+            }
+            results.append(result)
+
+        return Response(json.dumps(results))
+
+class Scrape(APIView):
+    def post(self, request):
+        results =[]
+        base_url = "https://www.etenders.gov.ie/epps/viewCFTSFromFTSAction.do"
+        request_url = base_url + request
+        for req in request_url:
+            resp = requests.get(req["url"])
+            soup = BeautifulSoup(resp.content, features="html.parser")
+            table = soup.find("table", attrs={"id": "T01"})
+            work_items =[]
+            if table is not None:
+                for row in table.find("tbody").find_all("tr"):
+                    columns = row.find_all("td")
+                    if len(columns) == 13:
+                        no = columns[0].text.strip()
+                        title = columns[1].find("a").text.strip()
+                        resource_id = columns[2].text.strip()
+                        client = columns[3].text.strip()
+                        date_publish = columns[5].text.strip()
+                        tenders_deadline = columns[6].text.strip()
+                        procedure = columns[7].text.strip()
+                        status = columns[8].text.strip()
+                        notice_pdf = columns[9].find("a")["href"]
+                        estimated_value = columns[11].text.strip()
+                        cycle = columns[12].text.strip()
+                        work_item ={
+                            "title":title,
+                            "resource_id":resource_id,
+                            "client": client,
+                            "date_publish":date_publish,
+                            "procedure": procedure,
+                            "deadline":datetime.strptime(tenders_deadline, "%a %b %d %H:%M:%S GMT %Y").strftime("%d/%m/%Y"),
                             "value":estimated_value,
                         }
                         work_items.append(work_item)
