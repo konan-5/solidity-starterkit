@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from bs4 import BeautifulSoup
-
+from .utils.scrape import fetch_entenders_cpv, fetch_entenders_epp
 class Scrape(APIView):
 
     permission_classes = (AllowAny,)
@@ -31,32 +31,10 @@ class Scrape(APIView):
                 for row in table.find("tbody").find_all("tr"):
                     columns = row.find_all("td")
                     if len(columns) == 13:
-                        no = columns[0].text.strip()
                         title = columns[1].find("a").text.strip()
-                        resource_id = columns[2].text.strip()
                         client = columns[3].text.strip()
-                        date_publish = columns[5].text.strip()
                         tenders_deadline = columns[6].text.strip()
-                        procedure = columns[7].text.strip()
-                        status = columns[8].text.strip()
-                        notice_pdf = columns[9].find("a")["href"]
                         estimated_value = columns[11].text.strip()
-                        cycle = columns[12].text.strip()
-                        values_list = [
-                            f"no: {no}",
-                            f"title: {title}",
-                            f"resource_id: {resource_id}",
-                            f"client: {client}",
-                            f"date_publish: {date_publish}",
-                            f"tenders_deadline: {tenders_deadline}",
-                            f"procedure: {procedure}",
-                            f"status: {status}",
-                            f"notice_pdf: {notice_pdf}",
-                            f"estimated_value: {estimated_value}",
-                            f"cycle: {cycle}"
-                        ]
-                        
-                        joined_string = "\n".join(values_list)
                         work_item ={
                             "title":title,
                             "deadline":datetime.strptime(tenders_deadline, "%a %b %d %H:%M:%S GMT %Y").strftime("%d/%m/%Y"),
@@ -72,45 +50,19 @@ class Scrape(APIView):
 
         return Response(json.dumps(results))
 
-class Scrape(APIView):
+
+
+class Search(APIView):
+    permission_classes = (AllowAny,)
     def post(self, request):
-        results =[]
-        base_url = "https://www.etenders.gov.ie/epps/viewCFTSFromFTSAction.do"
-        request_url = base_url + request
-        for req in request_url:
-            resp = requests.get(req["url"])
-            soup = BeautifulSoup(resp.content, features="html.parser")
-            table = soup.find("table", attrs={"id": "T01"})
-            work_items =[]
-            if table is not None:
-                for row in table.find("tbody").find_all("tr"):
-                    columns = row.find_all("td")
-                    if len(columns) == 13:
-                        no = columns[0].text.strip()
-                        title = columns[1].find("a").text.strip()
-                        resource_id = columns[2].text.strip()
-                        client = columns[3].text.strip()
-                        date_publish = columns[5].text.strip()
-                        tenders_deadline = columns[6].text.strip()
-                        procedure = columns[7].text.strip()
-                        status = columns[8].text.strip()
-                        notice_pdf = columns[9].find("a")["href"]
-                        estimated_value = columns[11].text.strip()
-                        cycle = columns[12].text.strip()
-                        work_item ={
-                            "title":title,
-                            "resource_id":resource_id,
-                            "client": client,
-                            "date_publish":date_publish,
-                            "procedure": procedure,
-                            "deadline":datetime.strptime(tenders_deadline, "%a %b %d %H:%M:%S GMT %Y").strftime("%d/%m/%Y"),
-                            "value":estimated_value,
-                        }
-                        work_items.append(work_item)
-            result = {
-                "category":req["category"],
-                "workItems":work_items,
-            }
-            results.append(result)
-
-        return Response(json.dumps(results))
+        keyword = request.data.get('keyword')
+        max_value =request.data.get('maxValue')
+        cpv = fetch_entenders_cpv(keyword)
+        epp ={
+            'max': max_value,
+            'type':'services',
+            'cpv':cpv
+        }
+        epps = fetch_entenders_epp(epp)
+        
+        return Response(epps)
