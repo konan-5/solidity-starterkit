@@ -28,8 +28,8 @@ class Scrape(APIView):
         new_url = f"https://www.etenders.gov.ie/epps/viewCFTSFromFTSAction.do?estimatedValueMax=&contractType=&contractType=&publicationUntilDate=&cpvLabels=&description=&description=&procedure=&procedure=&title=&tenderOpeningUntilDate=&cftId=&contractAuthority=&mode=search&cpcCategory=&cpcCategory=0&submissionUntilDate=&estimatedValueMin=&publicationFromDate={yesterday.strftime('%d/%m/%Y')}&submissionFromDate=&tenderOpeningFromDate=&d-3680175-p=&uniqueId=&status=&status=&T01_ps=100"
         new_tenders = fetch_public_tenders(new_url)
 
+        tickers =[]
         for req in request_url:
-            tickers =[]
             resp = requests.get(req["url"])
             soup = BeautifulSoup(resp.content, features="html.parser")
             table = soup.find("table", attrs={"id": "T01"})
