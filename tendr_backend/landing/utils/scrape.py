@@ -28,20 +28,27 @@ def fetch_entenders_cpv(request):
 
 def fetch_entenders_epp(request):
 
-    print(request['max'])
-    request_url = f"https://www.etenders.gov.ie/epps/viewCFTSFromFTSAction.do?estimatedValueMax={request['max']}0&contractType=cft.contract.type.{request['type']}&contractType=cft.contract.type.works&procedure=cft.procedure.type.open&contractAuthority=&mode=search&cpcCategory=0&estimatedValueMin=0&status=cft.status.tender.submission&status=cft.status.tender.submission&T01_ps=100&" + "&".join([f"cpvArray={x}" for x in request['cpv']])
+    request_url = f"https://www.etenders.gov.ie/epps/viewCFTSFromFTSAction.do?estimatedValueMax={request['max']}0&contractType=&procedure=&contractAuthority=&mode=search&cpcCategory=0&estimatedValueMin=0&status=cft.status.tender.submission&status=cft.status.tender.submission&T01_ps=100&cpvArray=${request['cpv']}"
     print(request_url)
     resp = requests.get(request_url)
     soup = BeautifulSoup(resp.content, features="html.parser")
+    results =[]
 
     table = soup.find('table', attrs = {'id':'T01'})
     if table is not None:
-        results =[]
         for row in table.find('tbody').find_all("tr"):
             columns = row.find_all("td")
             if len(columns) == 13:
                 no = columns[0].text.strip()
                 title = columns[1].find("a").text.strip()
+                category_link = columns[1].find("a")['href']
+                category_req_url = f"https://www.etenders.gov.ie{category_link}"
+                category_resp = requests.get(category_req_url)
+                soup = BeautifulSoup(category_resp.content, features="html.parser")
+                dt_element = soup.find('dt', string="CPV Codes:")
+                dd_element = dt_element.find_next_sibling('dd')
+                dd_text = dd_element.text.strip().split('\n')
+                category = dd_text[0]
                 preview_link_element = columns[1].find("a")
                 preview_link = preview_link_element["href"] if preview_link_element else ""
                 client = columns[3].text.strip()
@@ -58,8 +65,17 @@ def fetch_entenders_epp(request):
                     "tenders_deadline":datetime.strptime(tenders_deadline, "%a %b %d %H:%M:%S GMT %Y").strftime("%d/%m/%Y"),
                     "download_link":download_link,
                     "preview_link": preview_link,
+                    "category":category
                 }
                 results.append(result)
                 if no == '6':
                     break
     return results
+
+
+def fetch_public_tenders(request):
+    resp = requests.get(request)
+    soup = BeautifulSoup(resp.content, features="html.parser")
+    new_tenders_result = soup.find('div', attrs={"class":"SearchResults"})
+    strongs = new_tenders_result.find_all('strong')
+    return strongs[-1].text.strip()

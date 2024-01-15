@@ -1,17 +1,16 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import requests
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from bs4 import BeautifulSoup
-from .utils.scrape import fetch_entenders_cpv, fetch_entenders_epp
+from .utils.scrape import fetch_entenders_cpv, fetch_entenders_epp, fetch_public_tenders
 class Scrape(APIView):
 
     permission_classes = (AllowAny,)
     def post(self, request):
-        results =[]
         request_url = [
             {
                 "category":"Construction Works",
@@ -22,7 +21,15 @@ class Scrape(APIView):
                 "url":"https://www.etenders.gov.ie/epps/viewCFTSFromFTSAction.do?cpvArray=72000000-IT+services%3A+consulting%2C+software+development%2C+Internet+and+support&estimatedValueMax=5500000&contractType=&contractType=&publicationUntilDate=&cpvLabels=72000000&description=&description=&procedure=cft.procedure.type.open&procedure=cft.procedure.type.open&title=&tenderOpeningUntilDate=&cftId=&contractAuthority=&mode=search&cpcCategory=&cpcCategory=0&submissionUntilDate=&estimatedValueMin=0&publicationFromDate=&submissionFromDate=&tenderOpeningFromDate=&d-3680175-p=&uniqueId=&status=cft.status.tender.submission&status=cft.status.tender.submission&T01_ps=100"
             },
         ]
+        total_url = "https://www.etenders.gov.ie/epps/viewCFTSFromFTSAction.do?estimatedValueMax=&contractType=&contractType=&publicationUntilDate=&cpvLabels=&description=&description=&procedure=&procedure=&title=&tenderOpeningUntilDate=&cftId=&contractAuthority=&mode=search&cpcCategory=&cpcCategory=0&submissionUntilDate=&estimatedValueMin=&publicationFromDate=&submissionFromDate=&tenderOpeningFromDate=&d-3680175-p=&uniqueId=&status=&status=&T01_ps=100"
+        total_tenders = fetch_public_tenders(total_url)
+        today = datetime.now()
+        yesterday = today - timedelta(days=1)
+        new_url = f"https://www.etenders.gov.ie/epps/viewCFTSFromFTSAction.do?estimatedValueMax=&contractType=&contractType=&publicationUntilDate=&cpvLabels=&description=&description=&procedure=&procedure=&title=&tenderOpeningUntilDate=&cftId=&contractAuthority=&mode=search&cpcCategory=&cpcCategory=0&submissionUntilDate=&estimatedValueMin=&publicationFromDate={yesterday.strftime('%d/%m/%Y')}&submissionFromDate=&tenderOpeningFromDate=&d-3680175-p=&uniqueId=&status=&status=&T01_ps=100"
+        new_tenders = fetch_public_tenders(new_url)
+
         for req in request_url:
+            tickers =[]
             resp = requests.get(req["url"])
             soup = BeautifulSoup(resp.content, features="html.parser")
             table = soup.find("table", attrs={"id": "T01"})
@@ -42,25 +49,38 @@ class Scrape(APIView):
                             "value":estimated_value,
                         }
                         work_items.append(work_item)
-            result = {
+            ticker = {
                 "category":req["category"],
                 "workItems":work_items,
             }
-            results.append(result)
-
-        return Response(json.dumps(results))
-
-
+            tickers.append(ticker)
+        
+        response = {
+            "tenders":[
+                {
+                    'is_private':False,
+                    'newTenders':new_tenders,
+                    'totalTenders':total_tenders
+                },
+                {
+                    'is_private':True,
+                    'newTenders':47,
+                    'totalTenders':17925
+                },
+            ],
+            "tickers":tickers
+        }
+        return Response(response)
 
 class Search(APIView):
     permission_classes = (AllowAny,)
     def post(self, request):
-        keyword = request.data.get('keyword')
+        # keyword = request.data.get('keyword')
         max_value =request.data.get('maxValue')
-        cpv = fetch_entenders_cpv(keyword)
+        cpv =request.data.get('cpv')
+        # cpv = fetch_entenders_cpv(keyword)
         epp ={
             'max': max_value,
-            'type':'services',
             'cpv':cpv
         }
         epps = fetch_entenders_epp(epp)
