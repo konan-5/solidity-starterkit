@@ -7,6 +7,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from bs4 import BeautifulSoup
 from .utils.scrape import fetch_entenders_cpv, fetch_entenders_epp, fetch_public_tenders
+
 class Scrape(APIView):
 
     permission_classes = (AllowAny,)
@@ -60,12 +61,13 @@ class Scrape(APIView):
                 {
                     'is_private':False,
                     'newTenders':new_tenders,
-                    'totalTenders':total_tenders
+                    'totalTenders':total_tenders,
+                    'view_link':total_url
                 },
                 {
                     'is_private':True,
                     'newTenders':47,
-                    'totalTenders':17925
+                    'totalTenders':1795,
                 },
             ],
             "tickers":tickers
@@ -78,10 +80,11 @@ class Search(APIView):
         # keyword = request.data.get('keyword')
         max_value =request.data.get('maxValue')
         cpv =request.data.get('cpv')
+        print(request.data.get('maxValue'))
         # cpv = fetch_entenders_cpv(keyword)
         epp ={
             'max': max_value,
-            'cpv':cpv
+            'cpv':cpv,
         }
         epps = fetch_entenders_epp(epp)
         

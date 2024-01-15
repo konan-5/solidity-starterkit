@@ -28,11 +28,11 @@ def fetch_entenders_cpv(request):
 
 def fetch_entenders_epp(request):
 
-    request_url = f"https://www.etenders.gov.ie/epps/viewCFTSFromFTSAction.do?cpvArray=${request['cpv']}&cpvLabels={request['cpv'][:8]}&estimatedValueMax={request['max']}0&contractType=&procedure=&contractAuthority=&mode=search&cpcCategory=0&estimatedValueMin=0&status=cft.status.tender.submission&status=cft.status.tender.submission&T01_ps=100"
+    request_url = f"https://www.etenders.gov.ie/epps/viewCFTSFromFTSAction.do?cpvArray=${request['cpv']}&cpvLabels={request['cpv'][:8]}&estimatedValueMax={request['max']}&contractType=&procedure=&contractAuthority=&mode=search&cpcCategory=0&estimatedValueMin=0&status=cft.status.tender.submission&status=cft.status.tender.submission&T01_ps=100"
     print(request_url)
     resp = requests.get(request_url)
     soup = BeautifulSoup(resp.content, features="html.parser")
-    results =[]
+    epps =[]
 
     table = soup.find('table', attrs = {'id':'T01'})
     if table is not None:
@@ -67,9 +67,13 @@ def fetch_entenders_epp(request):
                     "preview_link": preview_link,
                     "category":category
                 }
-                results.append(result)
+                epps.append(result)
                 if no == '6':
                     break
+    results = {
+        'epps':epps,
+        'view_link': request_url 
+    }
     return results
 
 

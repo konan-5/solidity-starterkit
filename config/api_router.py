@@ -14,6 +14,7 @@ router.register("users", UserViewSet)
 
 urls = [
     path("landing/", include("tendr_backend.landing.urls")),
+    path("waitlist/", include("tendr_backend.waitlist.urls")),
 ]
 
 app_name = "api"
