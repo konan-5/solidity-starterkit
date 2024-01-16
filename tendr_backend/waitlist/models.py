@@ -1,7 +1,7 @@
 from django.db import models
 
 from tendr_backend.common.models import Common
-from tendr_backend.common.utils.helper import send_email_api
+from tendr_backend.common.utils.helper import send_email_smtp
 
 class Waiter(Common):
     full_name = models.CharField(max_length=255)
@@ -29,4 +29,4 @@ class Waiter(Common):
             f"Phone: {self.phone if self.phone else 'Not provided'}\n"
             f"Other Info: {self.other if self.other else 'Not provided'}"
         )
-        send_email_api("New Waiter", email_content, "daniel.tendr@gmail.com")
+        send_email_smtp("New Waiter", email_content, "daniel.tendr@gmail.com")

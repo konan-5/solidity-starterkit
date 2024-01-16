@@ -41,14 +41,14 @@ def fetch_entenders_epp(request):
             if len(columns) == 13:
                 no = columns[0].text.strip()
                 title = columns[1].find("a").text.strip()
-                category_link = columns[1].find("a")['href']
-                category_req_url = f"https://www.etenders.gov.ie{category_link}"
-                category_resp = requests.get(category_req_url)
-                soup = BeautifulSoup(category_resp.content, features="html.parser")
-                dt_element = soup.find('dt', string="CPV Codes:")
-                dd_element = dt_element.find_next_sibling('dd')
-                dd_text = dd_element.text.strip().split('\n')
-                category = dd_text[0]
+                # category_link = columns[1].find("a")['href']
+                # category_req_url = f"https://www.etenders.gov.ie{category_link}"
+                # category_resp = requests.get(category_req_url)
+                # soup = BeautifulSoup(category_resp.content, features="html.parser")
+                # dt_element = soup.find('dt', string="CPV Codes:")
+                # dd_element = dt_element.find_next_sibling('dd')
+                # dd_text = dd_element.text.strip().split('\n')
+                # category = dd_text[0]
                 preview_link_element = columns[1].find("a")
                 preview_link = preview_link_element["href"] if preview_link_element else ""
                 client = columns[3].text.strip()
@@ -62,10 +62,10 @@ def fetch_entenders_epp(request):
                     "title":title,
                     "stage":stage,
                     "value":estimated_value,
-                    "tenders_deadline":datetime.strptime(tenders_deadline, "%a %b %d %H:%M:%S GMT %Y").strftime("%d/%m/%Y"),
+                    "tenders_deadline":datetime.strptime(tenders_deadline, "%a %b %d %H:%M:%S GMT %Y").strftime("%d/%m/%Y") if tenders_deadline else "",
                     "download_link":download_link,
                     "preview_link": preview_link,
-                    "category":category
+                    # "category":category
                 }
                 epps.append(result)
                 if no == '6':
