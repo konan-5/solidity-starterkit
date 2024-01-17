@@ -64,11 +64,6 @@ class Scrape(APIView):
                     'totalTenders':total_tenders,
                     'view_link':total_url
                 },
-                {
-                    'is_private':True,
-                    'newTenders':47,
-                    'totalTenders':1795,
-                },
             ],
             "tickers":tickers
         }
