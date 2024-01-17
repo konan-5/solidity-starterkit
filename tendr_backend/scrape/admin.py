@@ -1,6 +1,20 @@
 from django.contrib import admin
 
-from .models import Tender, TenderDetail
+from .models import CftFile, Tender, TenderDetail
+
+
+@admin.register(CftFile)
+class CftFileAdmin(admin.ModelAdmin):
+    list_display = (
+        "addendum_id",
+        "title",
+        "file",
+        "description",
+        "lang",
+        "doument_version",
+        "action",
+    )
+    search_fields = ("title",)
 
 
 @admin.register(Tender)
@@ -61,5 +75,6 @@ class TenderDetailAdmin(admin.ModelAdmin):
         "date_of_awarding",
         "language_of_publication",
         "number_of_openers",
+        "cft_file",
     )
     search_fields = ("tender_id",)
