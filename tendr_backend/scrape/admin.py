@@ -75,6 +75,6 @@ class TenderDetailAdmin(admin.ModelAdmin):
         "date_of_awarding",
         "language_of_publication",
         "number_of_openers",
-        "cft_file",
+        # "cft_file",
     )
     search_fields = ("tender_id",)
