@@ -64,6 +64,21 @@ def get_cft_file(resource_id):
     return cft_files
 
 
+def get_tender_detail(detail_url):
+    request_url = f"https://www.etenders.gov.ie{detail_url}"
+    resp = requests.get(request_url)
+    soup = BeautifulSoup(resp.content, features="html.parser")
+    table = soup.find("dl", attrs={"class": "row no-gutters"})
+    if table:
+        dt_elements = table.find_all("dt")
+        data_dict = {}
+        for dt in dt_elements:
+            dt_text = re.sub(r"_+$", "", re.sub(r"[^\w]+", "_", dt.text.strip().lower()))
+            dd_text = dt.find_next("dd").text.strip().replace("\r", "").replace("\t", "")
+            data_dict[dt_text] = dd_text
+        return data_dict
+
+
 def main(page: int):
     request_url = f"https://www.etenders.gov.ie/epps/viewCFTSFromFTSAction.do?estimatedValueMax=&contractType=&publicationUntilDate=&cpvLabels=&description=&procedure=&title=&tenderOpeningUntilDate=&cftId=&contractAuthority=&mode=search&cpcCategory=&submissionUntilDate=&estimatedValueMin=&publicationFromDate=&submissionFromDate=&d-3680175-p={page}&tenderOpeningFromDate=&T01_ps=100&uniqueId=&status="  # noqa
     resp = requests.get(request_url)
@@ -75,6 +90,7 @@ def main(page: int):
             columns = row.find_all("td")
             if columns:
                 title = columns[1].find("a").text.strip()
+                detail_url = columns[1].find("a")["href"]
                 resource_id = columns[2].text.strip()
                 ca = columns[3].text.strip()
                 info = columns[4].find("img")["title"].strip()
@@ -93,6 +109,7 @@ def main(page: int):
                 award_date = columns[10].text.strip()
                 estimated_value = columns[11].text.strip()
                 cycle = columns[12].text.strip()
+                tender_detail = get_tender_detail(detail_url)
                 cft_files = get_cft_file(resource_id)
                 tender = {
                     "title": title,
@@ -107,6 +124,7 @@ def main(page: int):
                     "award_date": award_date,
                     "estimated_value": estimated_value,
                     "cycle": cycle,
+                    "tender_detail": tender_detail,
                     "cft_files": cft_files,
                 }
                 tenders.append(tender)

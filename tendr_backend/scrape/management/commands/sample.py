@@ -31,6 +31,7 @@ class Command(BaseCommand):
                     award_date=data["award_date"],
                     estimated_value=data["estimated_value"],
                     cycle=data["cycle"],
+                    tender_detail=data["tender_detail"],
                 )
                 tender.save()
                 if data["cft_files"]:
