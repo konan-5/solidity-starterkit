@@ -84,22 +84,25 @@ def get_client_info(info_url, resource_id):
         phone_number = dt_elements[9].find_next("dd").text.strip()
         fax = dt_elements[10].find_next("dd").text.strip()
         website = dt_elements[11].find_next("dd").text.strip()
-        client_info = ClientInfo(
-            resource_id=resource_id,
-            organisation_name=organisation_name,
-            ca_abbreviation=ca_abbreviation,
-            ca_type=ca_type,
-            annex=annex,
-            address=address,
-            eircode_or_postal_code=eircode_or_postal_code,
-            city=city,
-            county=county,
-            email=email,
-            phone_number=phone_number,
-            fax=fax,
-            website=website,
-        )
-        client_info.save()
+        try:
+            client_info = ClientInfo(
+                resource_id=resource_id,
+                organisation_name=organisation_name,
+                ca_abbreviation=ca_abbreviation,
+                ca_type=ca_type,
+                annex=annex,
+                address=address,
+                eircode_or_postal_code=eircode_or_postal_code,
+                city=city,
+                county=county,
+                email=email,
+                phone_number=phone_number,
+                fax=fax,
+                website=website,
+            )
+            client_info.save()
+        except Exception as e:
+            print(e)
 
 
 def get_tender_detail(detail_url, resource_id):
@@ -117,6 +120,7 @@ def get_tender_detail(detail_url, resource_id):
                     dd_text = dt.find_next("dd").find("a")["href"]
                 else:
                     info_url = dt.find_next("dd").find("a")["href"]
+                    dd_text = dt.find_next("dd").find("a").text.strip()
                     get_client_info(info_url, resource_id)
             else:
                 dd_text = dt.find_next("dd").text.strip().replace("\r", "").replace("\t", "")
