@@ -49,7 +49,6 @@ class Tender(Common):
     cycle = models.CharField(null=True, blank=True, max_length=2048)
     tender_detail = models.JSONField(default=dict, null=True, blank=True)
     cft_files = models.ManyToManyField(CftFile)
-    client_info = models.ForeignKey(ClientInfo, null=True, blank=True, on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return f"{self.title}"  # noqa

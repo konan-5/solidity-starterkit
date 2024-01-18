@@ -74,9 +74,20 @@ def get_tender_detail(detail_url):
         data_dict = {}
         for dt in dt_elements:
             dt_text = re.sub(r"_+$", "", re.sub(r"[^\w]+", "_", dt.text.strip().lower()))
-            dd_text = dt.find_next("dd").text.strip().replace("\r", "").replace("\t", "")
+            if dt.find_next("dd").find("a"):
+                if dt.find_next("dd").find("a", href=lambda href: href and "https://ted" in href):
+                    dd_text = dt.find_next("dd").find("a")["href"]
+                else:
+                    info_url = dt.find_next("dd").find("a")["href"]
+                    get_client_info(info_url)
+            else:
+                dd_text = dt.find_next("dd").text.strip().replace("\r", "").replace("\t", "")
             data_dict[dt_text] = dd_text
         return data_dict
+
+
+def get_client_info():
+    pass
 
 
 def main(page: int):
