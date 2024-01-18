@@ -15,7 +15,7 @@ class CftFile(Common):
 
 class Tender(Common):
     title = models.CharField(null=True, blank=True, max_length=2048)
-    resource_id = models.CharField(null=True, blank=True, max_length=2048)
+    resource_id = models.CharField(max_length=2048, unique=True)
     ca = models.CharField(null=True, blank=True, max_length=2048)
     info = models.TextField(null=True, blank=True)
     date_published = models.CharField(null=True, blank=True, max_length=2048)
