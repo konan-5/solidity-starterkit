@@ -34,7 +34,6 @@ class TenderAdmin(admin.ModelAdmin):
         "cycle",
         "tender_detail",
         "cft_files_list",
-        "client_info",
     )
     search_fields = ("title",)
 
@@ -46,6 +45,7 @@ class TenderAdmin(admin.ModelAdmin):
 @admin.register(ClientInfo)
 class ClientInfoAdmin(admin.ModelAdmin):
     list_display = (
+        "resource_id",
         "organisation_name",
         "ca_abbreviation",
         "ca_type",

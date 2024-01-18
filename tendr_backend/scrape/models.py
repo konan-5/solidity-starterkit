@@ -5,6 +5,7 @@ from tendr_backend.common.models import Common
 
 class ClientInfo(Common):
     organisation_name = models.CharField(null=True, blank=True, max_length=2048)
+    resource_id = models.CharField(max_length=2048, unique=True)
     ca_abbreviation = models.CharField(null=True, blank=True, max_length=2048)
     ca_type = models.CharField(null=True, blank=True, max_length=2048)
     annex = models.CharField(null=True, blank=True, max_length=2048)

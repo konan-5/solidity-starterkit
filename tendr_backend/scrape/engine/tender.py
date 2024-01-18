@@ -3,15 +3,16 @@ import time
 
 import requests
 from bs4 import BeautifulSoup
+from django.conf import settings
 
-from tendr_backend.scrape.models import CftFile
+from tendr_backend.scrape.models import CftFile, ClientInfo
 
 
 def download_file(url, destination):
     response = requests.get(url)
     if response.status_code == 200:
-        # with open(f"{settings.MEDIA_ROOT}/{destination}", "wb") as file:
-        #     file.write(response.content)
+        with open(f"{settings.MEDIA_ROOT}/{destination}", "wb") as file:
+            file.write(response.content)
         print(f"File downloaded successfully to {destination}")
         return destination
     else:
@@ -64,7 +65,44 @@ def get_cft_file(resource_id):
     return cft_files
 
 
-def get_tender_detail(detail_url):
+def get_client_info(info_url, resource_id):
+    request_url = f"https://www.etenders.gov.ie{info_url}"  # noqa
+    resp = requests.get(request_url)
+    soup = BeautifulSoup(resp.content, features="html.parser")
+    table = soup.find("dl", attrs={"class": "row no-gutters"})
+    dt_elements = table.find_all("dt")
+    if len(dt_elements) == 12:
+        organisation_name = dt_elements[0].find_next("dd").text.strip()
+        ca_abbreviation = dt_elements[1].find_next("dd").text.strip()
+        ca_type = dt_elements[2].find_next("dd").text.strip()
+        annex = dt_elements[3].find_next("dd").text.strip()
+        address = dt_elements[4].find_next("dd").text.strip()
+        eircode_or_postal_code = dt_elements[5].find_next("dd").text.strip()
+        city = dt_elements[6].find_next("dd").text.strip()
+        county = dt_elements[7].find_next("dd").text.strip()
+        email = dt_elements[8].find_next("dd").text.strip()
+        phone_number = dt_elements[9].find_next("dd").text.strip()
+        fax = dt_elements[10].find_next("dd").text.strip()
+        website = dt_elements[11].find_next("dd").text.strip()
+        client_info = ClientInfo(
+            resource_id=resource_id,
+            organisation_name=organisation_name,
+            ca_abbreviation=ca_abbreviation,
+            ca_type=ca_type,
+            annex=annex,
+            address=address,
+            eircode_or_postal_code=eircode_or_postal_code,
+            city=city,
+            county=county,
+            email=email,
+            phone_number=phone_number,
+            fax=fax,
+            website=website,
+        )
+        client_info.save()
+
+
+def get_tender_detail(detail_url, resource_id):
     request_url = f"https://www.etenders.gov.ie{detail_url}"
     resp = requests.get(request_url)
     soup = BeautifulSoup(resp.content, features="html.parser")
@@ -79,15 +117,11 @@ def get_tender_detail(detail_url):
                     dd_text = dt.find_next("dd").find("a")["href"]
                 else:
                     info_url = dt.find_next("dd").find("a")["href"]
-                    get_client_info(info_url)
+                    get_client_info(info_url, resource_id)
             else:
                 dd_text = dt.find_next("dd").text.strip().replace("\r", "").replace("\t", "")
             data_dict[dt_text] = dd_text
         return data_dict
-
-
-def get_client_info():
-    pass
 
 
 def main(page: int):
@@ -97,7 +131,7 @@ def main(page: int):
     table = soup.find("table", attrs={"id": "T01"})
     tenders = []
     if table is not None:
-        for idx, row in enumerate(table.find("tbody").find_all("tr")):
+        for row in table.find("tbody").find_all("tr"):
             columns = row.find_all("td")
             if columns:
                 title = columns[1].find("a").text.strip()
@@ -120,7 +154,7 @@ def main(page: int):
                 award_date = columns[10].text.strip()
                 estimated_value = columns[11].text.strip()
                 cycle = columns[12].text.strip()
-                tender_detail = get_tender_detail(detail_url)
+                tender_detail = get_tender_detail(detail_url, resource_id)
                 cft_files = get_cft_file(resource_id)
                 tender = {
                     "title": title,
@@ -139,8 +173,5 @@ def main(page: int):
                     "cft_files": cft_files,
                 }
                 tenders.append(tender)
-                if idx > 3:
-                    return tenders
-    # with open("../out.json", "w") as f:
-    #     f.write(str(work_items))
+
     return tenders
