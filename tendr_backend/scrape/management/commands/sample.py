@@ -13,7 +13,7 @@ class Command(BaseCommand):
     #     parser.add_argument('sample', nargs='+')
 
     def handle(self, *args, **options):
-        for i in range(41):
+        for i in range(410):
             items = main(i + 1)
             for data in items:
                 try:

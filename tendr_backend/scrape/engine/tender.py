@@ -26,7 +26,6 @@ def get_cft_file(resource_id):
     )
     resp = requests.get(request_url)
     soup = BeautifulSoup(resp.content, features="html.parser")
-    print(resource_id)
     cft_files = []
     tbody = soup.find("tbody")
     if tbody:
@@ -57,7 +56,6 @@ def get_cft_file(resource_id):
                     doument_version=doument_version,
                     action=action,
                 )
-                print(cft_file)
                 cft_files.append(cft_file)
             except Exception as e:
                 print(e)
@@ -137,6 +135,7 @@ def main(page: int):
     if table is not None:
         for row in table.find("tbody").find_all("tr"):
             columns = row.find_all("td")
+            print("page", page)
             if columns:
                 title = columns[1].find("a").text.strip()
                 detail_url = columns[1].find("a")["href"]
@@ -154,7 +153,6 @@ def main(page: int):
                     )
                 else:
                     notice_pdf = None
-                print(notice_pdf)
                 award_date = columns[10].text.strip()
                 estimated_value = columns[11].text.strip()
                 cycle = columns[12].text.strip()
