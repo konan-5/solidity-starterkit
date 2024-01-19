@@ -11,7 +11,7 @@ SECRET_KEY = env(
     default="lQ9Kjda5PeFtky0CnG29NoTsAlppgDgfwKymr7sfc9tooiPi1ra74lQ4opF1NaUT",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "3.253.3.32", "tendr.bid" ,"www.tendr.bid"]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "3.253.3.32", "tendr.bid", "www.tendr.bid", "admin.tendr.bid"]
 
 
 CORS_ORIGIN_WHITELIST = [
@@ -19,6 +19,7 @@ CORS_ORIGIN_WHITELIST = [
     "http://3.253.3.32:9001",
     "http://tendr.bid",
     "http://www.tendr.bid",
+    "http://admin.tendr.bid",
 ]
 # CACHES
 # ------------------------------------------------------------------------------
