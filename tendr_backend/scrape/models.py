@@ -3,25 +3,6 @@ from django.db import models
 from tendr_backend.common.models import Common
 
 
-class ClientInfo(Common):
-    organisation_name = models.CharField(null=True, blank=True, max_length=2048)
-    resource_id = models.CharField(max_length=2048, unique=True)
-    ca_abbreviation = models.CharField(null=True, blank=True, max_length=2048)
-    ca_type = models.CharField(null=True, blank=True, max_length=2048)
-    annex = models.CharField(null=True, blank=True, max_length=2048)
-    address = models.CharField(null=True, blank=True, max_length=2048)
-    eircode_or_postal_code = models.CharField(null=True, blank=True, max_length=2048)
-    city = models.CharField(null=True, blank=True, max_length=2048)
-    county = models.CharField(null=True, blank=True, max_length=2048)
-    email = models.CharField(null=True, blank=True, max_length=2048)
-    phone_number = models.CharField(null=True, blank=True, max_length=2048)
-    fax = models.CharField(null=True, blank=True, max_length=2048)
-    website = models.CharField(null=True, blank=True, max_length=2048)
-
-    def __str__(self):
-        return f"{self.organisation_name}"
-
-
 class CftFile(Common):
     addendum_id = models.CharField(null=True, blank=True, max_length=2048)
     title = models.CharField(null=True, blank=True, max_length=2048)
@@ -53,3 +34,22 @@ class Tender(Common):
 
     def __str__(self):
         return f"{self.title}"  # noqa
+
+
+class ClientInfo(Common):
+    organisation_name = models.CharField(null=True, blank=True, max_length=2048)
+    tendr_id = models.ForeignKey(Tender, on_delete=models.DO_NOTHING, null=True, blank=True, default=None)
+    ca_abbreviation = models.CharField(null=True, blank=True, max_length=2048)
+    ca_type = models.CharField(null=True, blank=True, max_length=2048)
+    annex = models.CharField(null=True, blank=True, max_length=2048)
+    address = models.CharField(null=True, blank=True, max_length=2048)
+    eircode_or_postal_code = models.CharField(null=True, blank=True, max_length=2048)
+    city = models.CharField(null=True, blank=True, max_length=2048)
+    county = models.CharField(null=True, blank=True, max_length=2048)
+    email = models.CharField(null=True, blank=True, max_length=2048)
+    phone_number = models.CharField(null=True, blank=True, max_length=2048)
+    fax = models.CharField(null=True, blank=True, max_length=2048)
+    website = models.CharField(null=True, blank=True, max_length=2048)
+
+    def __str__(self):
+        return f"{self.organisation_name}"

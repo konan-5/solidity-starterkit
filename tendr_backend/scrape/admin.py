@@ -45,7 +45,6 @@ class TenderAdmin(admin.ModelAdmin):
 @admin.register(ClientInfo)
 class ClientInfoAdmin(admin.ModelAdmin):
     list_display = (
-        "resource_id",
         "organisation_name",
         "ca_abbreviation",
         "ca_type",
