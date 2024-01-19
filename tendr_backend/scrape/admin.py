@@ -23,7 +23,7 @@ class TenderAdmin(admin.ModelAdmin):
         "title",
         "resource_id",
         "ca",
-        "info",
+        # "info",
         "date_published",
         "tenders_submission_deadline",
         "procedure",
@@ -32,14 +32,15 @@ class TenderAdmin(admin.ModelAdmin):
         "award_date",
         "estimated_value",
         "cycle",
-        "tender_detail",
+        # "tender_detail",
         "cft_files_list",
     )
     search_fields = ("title",)
 
     @admin.display(description="Cft Files")
     def cft_files_list(self, obj):
-        return "\n".join([f"{cft_file.title[:9]}...-{str(cft_file.file)}" for cft_file in obj.cft_files.all()])
+        # return "\n".join([f"{cft_file.title[:9]}...-{str(cft_file.file)}" for cft_file in obj.cft_files.all()])
+        return "\n".join([cft_file.file for cft_file in obj.cft_files.all()])
 
 
 @admin.register(ClientInfo)

@@ -1,6 +1,8 @@
 import boto3
 import environ
 
+from tendr_backend.scrape.engine.local import delete_file
+
 env = environ.Env()
 
 AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID", "")
@@ -21,6 +23,8 @@ def upload_to_s3(local_file_path, s3_key):
         print(f"File uploaded successfully to S3 with key: {s3_key}")
     except Exception as e:
         print(f"Error uploading file to S3: {e}")
+    finally:
+        delete_file(local_file_path)
 
 
 def download_from_s3(s3_key, local_file_path):

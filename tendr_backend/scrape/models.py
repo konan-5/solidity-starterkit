@@ -37,8 +37,8 @@ class Tender(Common):
 
 
 class ClientInfo(Common):
-    organisation_name = models.CharField(null=True, blank=True, max_length=2048)
     tendr_id = models.ForeignKey(Tender, on_delete=models.DO_NOTHING, null=True, blank=True, default=None)
+    organisation_name = models.CharField(null=True, blank=True, max_length=2048)
     ca_abbreviation = models.CharField(null=True, blank=True, max_length=2048)
     ca_type = models.CharField(null=True, blank=True, max_length=2048)
     annex = models.CharField(null=True, blank=True, max_length=2048)
