@@ -32,8 +32,17 @@ def download_from_s3(s3_key, local_file_path):
         print(f"Error downloading file from S3: {e}")
 
 
+def delete_from_s3(s3_key):
+    try:
+        # Delete file from S3 bucket
+        s3.delete_object(Bucket=BUCKET_NAME, Key=s3_key)
+        print(f"File deleted successfully from S3 with key: {s3_key}")
+    except Exception as e:
+        print(f"Error deleting file from S3: {e}")
+
+
 # examples
-# # Local file path to upload
+# Local file path to upload
 # local_upload_file_path = 'setup.cfg'
 # s3_upload_key = 'cft-files/file.cfg'  # The S3 object key (file path inside the bucket)
 
@@ -41,8 +50,12 @@ def download_from_s3(s3_key, local_file_path):
 # local_download_file_path = 'a.py'
 # s3_download_key = 'cft-files/file.py'  # The S3 object key (file path inside the bucket)
 
-# # Upload file to S3
+# Upload file to S3
 # upload_to_s3(local_upload_file_path, s3_upload_key)
 
 # # Download file from S3
 # download_from_s3(s3_download_key, local_download_file_path)
+
+
+# # Delete file from S3
+# delete_from_s3(s3_upload_key)
