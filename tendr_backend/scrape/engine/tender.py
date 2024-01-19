@@ -18,7 +18,7 @@ def download_file(url, destination):
                 file.write(response.content)
             print(f"File downloaded successfully to {destination}")
             upload_to_s3(local_path, destination)
-            return f"https://s3.amazonaws.com/{destination}"
+            return f"https://tendr.s3.eu-west-1.amazonaws.com/{destination}"
         else:
             print(f"Failed to download file. Status code: {response.status_code}")
             return None
