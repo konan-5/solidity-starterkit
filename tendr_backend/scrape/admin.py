@@ -40,7 +40,7 @@ class TenderAdmin(admin.ModelAdmin):
     @admin.display(description="Cft Files")
     def cft_files_list(self, obj):
         # return "\n".join([f"{cft_file.title[:9]}...-{str(cft_file.file)}" for cft_file in obj.cft_files.all()])
-        return "\n".join([cft_file.file for cft_file in obj.cft_files.all()])
+        return "\n".join([f"{cft_file.file}" for cft_file in obj.cft_files.all()])
 
 
 @admin.register(ClientInfo)
