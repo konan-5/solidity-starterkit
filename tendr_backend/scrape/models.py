@@ -6,7 +6,7 @@ from tendr_backend.common.models import Common
 class CftFile(Common):
     addendum_id = models.CharField(null=True, blank=True, max_length=2048)
     title = models.CharField(null=True, blank=True, max_length=2048)
-    file = models.FileField(upload_to="cft_file/", null=True, blank=True, unique=True)
+    file = models.CharField(null=True, blank=True, unique=True, max_length=2048)
     description = models.CharField(null=True, blank=True, max_length=2048)
     lang = models.CharField(null=True, blank=True, max_length=2048)
     doument_version = models.CharField(null=True, blank=True, max_length=2048)
@@ -25,7 +25,7 @@ class Tender(Common):
     tenders_submission_deadline = models.CharField(null=True, blank=True, max_length=2048)
     procedure = models.CharField(null=True, blank=True, max_length=2048)
     status = models.CharField(null=True, blank=True, max_length=2048)
-    notice_pdf = models.FileField(null=True, blank=True, upload_to="notice_pdf/")
+    notice_pdf = models.CharField(null=True, blank=True, max_length=2048)
     award_date = models.CharField(null=True, blank=True, max_length=2048)
     estimated_value = models.CharField(null=True, blank=True, max_length=2048)
     cycle = models.CharField(null=True, blank=True, max_length=2048)
