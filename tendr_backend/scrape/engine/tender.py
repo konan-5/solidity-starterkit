@@ -66,6 +66,11 @@ def get_cft_file(resource_id):
                     )
                     cft_files.append(cft_file)
                 except Exception as e:
+                    try:
+                        cft_file = CftFile.objects.get(file=file)
+                        cft_files.append(cft_file)
+                    except Exception as e:
+                        print(e)
                     print(e)
             time.sleep(1)
         return cft_files

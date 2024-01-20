@@ -35,7 +35,10 @@ class TenderAdmin(admin.ModelAdmin):
         # "tender_detail",
         "cft_files_list",
     )
-    search_fields = ("title",)
+    search_fields = (
+        "title",
+        "resource_id",
+    )
 
     @admin.display(description="Cft Files")
     def cft_files_list(self, obj):
