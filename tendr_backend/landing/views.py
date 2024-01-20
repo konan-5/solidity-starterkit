@@ -1,9 +1,13 @@
 import json
+import time
 from datetime import datetime, timedelta
 
 import requests
 from bs4 import BeautifulSoup
+from dateutil import parser
+from django.db import models
 from django.shortcuts import render
+from django.utils import timezone
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -13,12 +17,29 @@ from tendr_backend.scrape.models import Tender
 from .utils.scrape import fetch_entenders_epp, fetch_public_tenders
 
 
+def parse_date(date_string):
+    dt = parser.parse(date_string)
+
+    # If the datetime object is naive (no timezone info), assume UTC
+    if dt.tzinfo is None or dt.tzinfo.utcoffset(dt) is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+
+    # Getting Unix time
+    unix_time = int(dt.timestamp())
+
+    return unix_time
+
+
 class Scrape(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        new_tenders = 9
-        total_tenders = 5
+        now = time.time()
+        twenty_four_hours_ago = now - 24 * 3600
+        date_published_values = Tender.objects.values_list("date_published", flat=True).filter(
+            date_published__isnull=False
+        )
+        new_tenders = len([x for x in list(date_published_values)[:150] if parse_date(x) > twenty_four_hours_ago])
         tickers = [
             {
                 "category": "s",
@@ -37,11 +58,12 @@ class Scrape(APIView):
                 {
                     "is_private": False,
                     "newTenders": new_tenders,
-                    "totalTenders": total_tenders,
+                    "totalTenders": Tender.objects.count(),
                 },
             ],
             "tickers": tickers,
         }
+        print(time.time() - now, "aaaaaaaaa")
         return Response(response)
 
 
@@ -50,16 +72,26 @@ class Search(APIView):
 
     def post(self, request):
         # keyword = request.data.get('keyword')
-        max_value = request.data.get("maxValue")
+        max_value = request.data.get("max_value")
         cpv = request.data.get("cpv")
-        print(request.data.get("maxValue"))
+        print(max_value)
         # cpv = fetch_entenders_cpv(keyword)
         epp = {
             "max": max_value,
             "cpv": cpv,
         }
-        epps = fetch_entenders_epp(epp)
-
+        # epps = fetch_entenders_epp(epp)
+        epps = [
+            {
+                "client": "1",
+                "title": "3",
+                "stage": "e",
+                "value": "w",
+                "tenders_deadline": "f",
+                "download_link": "e",
+                "preview_link": "d",
+            }
+        ]
         return Response(epps)
 
 
