@@ -34,6 +34,7 @@ class TenderAdmin(admin.ModelAdmin):
         "cycle",
         # "tender_detail",
         "cft_files_list",
+        "created_at",
     )
     search_fields = ("title", "resource_id", "date_published")
 

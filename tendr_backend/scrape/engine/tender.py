@@ -153,17 +153,23 @@ def main(page: int):
     try:
         request_url = f"https://www.etenders.gov.ie/epps/viewCFTSFromFTSAction.do?estimatedValueMax=&contractType=&publicationUntilDate=&cpvLabels=&description=&procedure=&title=&tenderOpeningUntilDate=&cftId=&contractAuthority=&mode=search&cpcCategory=&submissionUntilDate=&estimatedValueMin=&publicationFromDate=&submissionFromDate=&d-3680175-p={page}&tenderOpeningFromDate=&T01_ps=100&uniqueId=&status="  # noqa
         resp = requests.get(request_url)
+        print(resp.status_code)
         soup = BeautifulSoup(resp.content, features="html.parser")
         table = soup.find("table", attrs={"id": "T01"})
         # tenders = []
+        print("page", page)
         if table is not None:
             for row in table.find("tbody").find_all("tr"):
                 columns = row.find_all("td")
-                print("page", page)
                 if columns:
                     title = columns[1].find("a").text.strip()
                     detail_url = columns[1].find("a")["href"]
                     resource_id = columns[2].text.strip()
+                    try:
+                        Tender.objects.get(resource_id=resource_id)
+                        continue
+                    except Exception as e:
+                        print(e)
                     ca = columns[3].text.strip()
                     info = columns[4].find("img")["title"].strip()
                     date_published = columns[5].text.strip()

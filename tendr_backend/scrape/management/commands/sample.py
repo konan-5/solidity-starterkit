@@ -12,6 +12,6 @@ class Command(BaseCommand):
     #     parser.add_argument('sample', nargs='+')
 
     def handle(self, *args, **options):
-        for i in range(1, 42):
+        for i in range(1, 43):
             main(i)
             time.sleep(1)
