@@ -21,7 +21,7 @@ class Tender(Common):
     resource_id = models.CharField(max_length=2048, unique=True)
     ca = models.CharField(null=True, blank=True, max_length=2048)
     info = models.TextField(null=True, blank=True)
-    date_published = models.CharField(null=True, blank=True, max_length=2048)
+    date_published = models.DateTimeField(null=True, blank=True)
     tenders_submission_deadline = models.CharField(null=True, blank=True, max_length=2048)
     procedure = models.CharField(null=True, blank=True, max_length=2048)
     status = models.CharField(null=True, blank=True, max_length=2048)
