@@ -12,5 +12,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         tenders = Tender.objects.all()
         for tender in tenders:
-            if tender.cpv_code is None:
-                print(tender.pk, tender.resource_id)
+            try:
+                tender.estimated_value = int(tender.estimated_value)
+            except Exception as e:
+                print(e)

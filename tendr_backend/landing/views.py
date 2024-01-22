@@ -9,6 +9,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from tendr_backend.common.constant import CATEGORIES
 from tendr_backend.scrape.models import Tender
 
 
@@ -32,19 +33,15 @@ class Scrape(APIView):
         now = time.time()
         twenty_four_hours_ago = timezone.now() - timezone.timedelta(hours=24)
         new_tenders = Tender.objects.filter(date_published__gt=twenty_four_hours_ago).count()
-        tickers = [
-            {
-                "category": "s",
-                "workItems": [
-                    {
-                        "title": "",
-                        "deadline": "",
-                        "client": "",
-                        "value": "",
-                    }
-                ],
-            }
-        ]
+        tickers = []
+        for category in CATEGORIES:
+            ticker = {"category": category}
+
+            tenders_with_cpv_starting_category2 = Tender.objects.filter(cpv_code__startswith=category[:2]).values(
+                "title", "tenders_submission_deadline", "ca", "estimated_value"
+            )
+            ticker["workItems"] = tenders_with_cpv_starting_category2
+            tickers.append(ticker)
         response = {
             "widgets": [
                 {
