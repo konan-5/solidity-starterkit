@@ -4,6 +4,7 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 from dateutil import parser
+from django.db.models import Q
 from django.utils import timezone
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -37,9 +38,9 @@ class Scrape(APIView):
         for category in CATEGORIES:
             ticker = {"category": category}
 
-            tenders_with_cpv_starting_category2 = Tender.objects.filter(cpv_code__startswith=category[:2]).values(
-                "title", "tenders_submission_deadline", "ca", "estimated_value"
-            )
+            tenders_with_cpv_starting_category2 = Tender.objects.filter(
+                Q(cpv_code__startswith=category[:2]) & Q(estimated_value__gt=100000) & Q(estimated_value__lt=50000000)
+            ).values("title", "tenders_submission_deadline", "ca", "estimated_value")
             ticker["workItems"] = tenders_with_cpv_starting_category2
             tickers.append(ticker)
         response = {
