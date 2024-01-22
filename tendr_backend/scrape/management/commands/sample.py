@@ -12,6 +12,7 @@ class Command(BaseCommand):
     #     parser.add_argument('sample', nargs='+')
 
     def handle(self, *args, **options):
+        main(1)
         return
         for i in range(1, 43):
             main(i)

@@ -8,20 +8,39 @@ from django.conf import settings
 from tendr_backend.scrape.engine.aws_s3 import upload_to_s3
 from tendr_backend.scrape.models import CftFile, ClientInfo, Tender
 
+# def download_file(url, destination):
+#     try:
+#         local_path = f"{settings.MEDIA_ROOT}/{destination}"
+#         response = requests.get(url)
+#         if response.status_code == 200:
+#             with open(local_path, "wb") as file:
+#                 file.write(response.content)
+#             print(f"File downloaded successfully to {destination}")
+#             upload_to_s3(local_path, destination)
+#             return f"https://tendr.s3.eu-west-1.amazonaws.com/{destination}"
+#         else:
+#             print(f"Failed to download file. Status code: {response.status_code}")
+#             return None
+#     except Exception as e:
+#         print(e)
+#         return None
+
 
 def download_file(url, destination):
     try:
         local_path = f"{settings.MEDIA_ROOT}/{destination}"
-        response = requests.get(url)
-        if response.status_code == 200:
-            with open(local_path, "wb") as file:
-                file.write(response.content)
-            print(f"File downloaded successfully to {destination}")
-            upload_to_s3(local_path, destination)
-            return f"https://tendr.s3.eu-west-1.amazonaws.com/{destination}"
-        else:
-            print(f"Failed to download file. Status code: {response.status_code}")
-            return None
+        with requests.get(url, stream=True) as response:
+            if response.status_code == 200:
+                with open(local_path, "wb") as file:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        if chunk:  # filter out keep-alive chunks
+                            file.write(chunk)
+                print(f"File downloaded successfully to {destination}")
+                upload_to_s3(local_path, destination)
+                return f"https://tendr.s3.eu-west-1.amazonaws.com/{destination}"
+            else:
+                print(f"Failed to download file. Status code: {response.status_code}")
+                return None
     except Exception as e:
         print(e)
         return None
