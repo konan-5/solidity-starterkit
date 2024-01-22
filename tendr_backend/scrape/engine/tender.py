@@ -201,7 +201,8 @@ def main(page: int):
                         award_date=award_date,
                         estimated_value=estimated_value,
                         cycle=cycle,
-                        tender_detail=tender_detail
+                        tender_detail=tender_detail,
+                        cpv_code=tender_detail["cpv_codes"]
                         # "cft_files": cft_files,
                     )
                     tender.save()
