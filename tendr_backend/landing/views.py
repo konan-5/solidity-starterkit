@@ -1,20 +1,15 @@
-import json
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import requests
 from bs4 import BeautifulSoup
 from dateutil import parser
-from django.db import models
-from django.shortcuts import render
 from django.utils import timezone
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from tendr_backend.scrape.models import Tender
-
-from .utils.scrape import fetch_entenders_epp, fetch_public_tenders
 
 
 def parse_date(date_string):
@@ -35,11 +30,8 @@ class Scrape(APIView):
 
     def post(self, request):
         now = time.time()
-        twenty_four_hours_ago = now - 24 * 3600
-        date_published_values = Tender.objects.values_list("date_published", flat=True).filter(
-            date_published__isnull=False
-        )
-        new_tenders = len([x for x in list(date_published_values)[:150] if parse_date(x) > twenty_four_hours_ago])
+        twenty_four_hours_ago = timezone.now() - timezone.timedelta(hours=24)
+        new_tenders = Tender.objects.filter(date_published__gt=twenty_four_hours_ago).count()
         tickers = [
             {
                 "category": "s",
