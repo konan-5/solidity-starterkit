@@ -13,6 +13,7 @@ class Command(BaseCommand):
         tenders = Tender.objects.all()
         for tender in tenders:
             try:
-                tender.estimated_value = int(tender.estimated_value)
+                print(float(f"{tender.estimated_value}"))
             except Exception as e:
-                print(e)
+                tender.estimated_value = None
+                tender.save()

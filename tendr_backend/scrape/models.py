@@ -27,7 +27,7 @@ class Tender(Common):
     status = models.CharField(null=True, blank=True, max_length=2048)
     notice_pdf = models.CharField(null=True, blank=True, max_length=2048)
     award_date = models.CharField(null=True, blank=True, max_length=2048)
-    estimated_value = models.CharField(null=True, blank=True, max_length=2048)
+    estimated_value = models.FloatField(null=True, blank=True, default=None)
     cycle = models.CharField(null=True, blank=True, max_length=2048)
     tender_detail = models.JSONField(default=dict, null=True, blank=True)
     cft_files = models.ManyToManyField(CftFile)
