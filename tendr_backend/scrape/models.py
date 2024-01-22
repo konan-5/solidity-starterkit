@@ -21,24 +21,25 @@ class Tender(Common):
     resource_id = models.CharField(max_length=2048, unique=True)
     ca = models.CharField(null=True, blank=True, max_length=2048)
     info = models.TextField(null=True, blank=True)
-    date_published = models.CharField(null=True, blank=True, max_length=2048)
+    date_published = models.DateTimeField(null=True, blank=True)
     tenders_submission_deadline = models.CharField(null=True, blank=True, max_length=2048)
     procedure = models.CharField(null=True, blank=True, max_length=2048)
     status = models.CharField(null=True, blank=True, max_length=2048)
     notice_pdf = models.CharField(null=True, blank=True, max_length=2048)
     award_date = models.CharField(null=True, blank=True, max_length=2048)
-    estimated_value = models.CharField(null=True, blank=True, max_length=2048)
+    estimated_value = models.FloatField(null=True, blank=True, default=None)
     cycle = models.CharField(null=True, blank=True, max_length=2048)
     tender_detail = models.JSONField(default=dict, null=True, blank=True)
     cft_files = models.ManyToManyField(CftFile)
+    cpv_code = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.title}"  # noqa
 
 
 class ClientInfo(Common):
-    organisation_name = models.CharField(null=True, blank=True, max_length=2048)
     tendr_id = models.ForeignKey(Tender, on_delete=models.DO_NOTHING, null=True, blank=True, default=None)
+    organisation_name = models.CharField(null=True, blank=True, max_length=2048)
     ca_abbreviation = models.CharField(null=True, blank=True, max_length=2048)
     ca_type = models.CharField(null=True, blank=True, max_length=2048)
     annex = models.CharField(null=True, blank=True, max_length=2048)
